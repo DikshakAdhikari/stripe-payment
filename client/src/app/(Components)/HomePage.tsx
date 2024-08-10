@@ -111,7 +111,9 @@ const HomePage = () => {
                     </div>
                   )} */}
                   <div className="absolute bottom-2 right-2 flex items-center gap-1">
-                    <button
+
+                    <button onClick={() => handleAdd(beer)} className=" bg-blue-600 p-3 rounded-lg text-white">Add To Cart</button>
+                    {/* <button
                       className="px-2 py-0 bg-gray-300 text-gray-700 rounded shadow-md hover:bg-gray-400"
                       onClick={handleSub}
                     >
@@ -122,7 +124,7 @@ const HomePage = () => {
                       className="px-2 py-0 bg-green-500 text-white rounded shadow-md hover:bg-green-600"
                     >
                       +
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>
