@@ -21,9 +21,9 @@ const totalItemsPrice= (items)=> {
 orderRouter.post('/create-payment', async(req,res)=> {
         try{
             const id= '33434'
-            const {items , payment_intent_id, address }= req.body;
+            const {items , address }= req.body;
+            let payment_intent_id='pi_3PmDVTHaMXngjvdd0RK7QXdF'
             const totalAmount=  totalItemsPrice(items)*100
-            console.log(totalAmount);
             const orderData= {
                 amount: totalAmount,
                 currency:"usd",
@@ -35,26 +35,30 @@ orderRouter.post('/create-payment', async(req,res)=> {
             }
             
             if(payment_intent_id){
-
+                console.log(payment_intent_id);
                 const current_intent = await stripe.paymentIntents.retrieve(
                     payment_intent_id
                   );
-
+                //   console.log('current Intent:e ', current_intent);
                   if(current_intent){
                     const updated_intent = await stripe.paymentIntents.update(
                         payment_intent_id,
                         {amount:totalAmount}
                       );
-
-                      const [existing_order, updatedOrders]= await Promise.all([
-                        orders.findOne({paymentIntentId:payment_intent_id}) ,
-                        orders.findByIdAndUpdate({paymentIntentId:payment_intent_id}, {
-                            amount:totalAmount , 
-                            products:items
-                        })
-                      ])
-    
-                      if(!existing_order){
+                    //   console.log('updatedd intentt: ',updated_intent);
+                      const [existingOrder, updatedOrder] = await Promise.all([
+                        orders.findOne({ paymentIntentId: payment_intent_id }),
+                        orders.findOneAndUpdate(
+                            { paymentIntentId: payment_intent_id },
+                            {
+                                amount: totalAmount,
+                                products: items,
+                            },
+                            { new: true } 
+                        )
+                    ]);
+                    //   console.log('existingg order: ', existingOrder);
+                      if(!existingOrder){
                         return res.status(400).json({error:"Invalid Intent Id!"})
                       }
                       res.json({paymentIntent: updated_intent })
@@ -80,6 +84,7 @@ orderRouter.post('/create-payment', async(req,res)=> {
             
             
     }catch(err){
+        console.log('damnnn');
         res.json({message:err})
     }
 } )
