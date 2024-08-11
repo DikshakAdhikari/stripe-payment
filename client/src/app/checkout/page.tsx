@@ -8,17 +8,23 @@ import CheckoutForm from '../(Components)/CheckoutForm';
 const stripePromise = loadStripe('pk_test_51PjdabHaMXngjvddCslsW5iG4UdPyWrF1IGT8KOHLBhkljubXyec28cAqYl7eFOsX4xOORWWy5tZnxV48Dilt0gQ00uaIYQL0B');
 
 export default function App() {
+    
     // @ts-ignore
     const output= JSON.parse(localStorage.getItem("paymentIntentId"))
     console.log(output);
   const options = {
     // passing the client secret obtained from the server
     clientSecret: output.client_secret,
+    appearance:{
+        theme:'stripe',
+        label:'floating'
+    }
   };
 
   return (
+    // @ts-ignore
     <Elements stripe={stripePromise} options={options}>
-      <CheckoutForm />
+      <CheckoutForm clientSecret={output.client_secret} />
     </Elements>
   );
 };
