@@ -1,11 +1,12 @@
 import React from "react";
+import { BASE_URL } from "./base";
 
 interface Book {
   id: number;
   bookname: string;
   price: number;
   image: string;
-  bookCount: number;
+  quantity: number;
 }
 
 interface CartProps {
@@ -18,12 +19,12 @@ interface CartProps {
 
 const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
   // Calculate total price based on quantities
-  const totalPrice = arr.reduce((acc, item) => acc + item.price * item.bookCount, 0);
+  const totalPrice = arr.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   // Handle increment for a specific book
   const handleIncrement = (index: number) => {
     const updatedArr = arr.map((item, idx) =>
-      idx === index ? { ...item, bookCount: item.bookCount + 1 } : item
+      idx === index ? { ...item, quantity: item.quantity + 1 } : item
     );
     setArr(updatedArr);
     setCount((prevCount) => prevCount + 1); // Update total count if needed
@@ -31,51 +32,97 @@ const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
 
   // Handle decrement for a specific book
   const handleDecrement = (index: number) => {
-    const updatedArr = arr.map((item, idx) => {
-      if (idx === index) {
-        const newCount = item.bookCount - 1;
-        return { ...item, bookCount: newCount };
-      }
-      return item;
-    }).filter((item) => item.bookCount > 0); // Filter out items with 0 count
+    const updatedArr = arr
+      .map((item, idx) => {
+        if (idx === index) {
+          const newCount = item.quantity - 1;
+          return { ...item, quantity: newCount };
+        }
+        return item;
+      })
+      .filter((item) => item.quantity > 0); // Filter out items with 0 count
 
     setArr(updatedArr);
-    setCount(updatedArr.reduce((acc, item) => acc + item.bookCount, 0)); // Update total count
+    setCount(updatedArr.reduce((acc, item) => acc + item.quantity, 0)); // Update total count
+  };
+
+  // Handle checkout action
+  const handleCheckout = async() => {
+    try{
+      console.log(totalPrice);
+      
+      const res= await fetch(`${BASE_URL}/orders/create-payment`,{
+        method:"POST",
+        // @ts-ignore
+        headers:{
+          'Content-Type':"application/json",
+          "authorization": localStorage.getItem('token')
+        },
+        body:JSON.stringify({items:arr, amount:totalPrice})
+      });
+  
+      if(!res.ok){
+        throw new Error("Network problem!")
+      }
+      
+      const data = await res.json()
+      console.log(data);
+      console.log(data);
+      
+    }catch(err){
+      console.log(err);
+      
+    }
+
+
   };
 
   return (
     <>
       <div
-        className={`fixed top-0 right-0 h-full w-[70%] bg-white transition-transform transform ${
+        className={`fixed top-0 right-0 h-full w-[70%] md:w-[40%] bg-white shadow-lg transition-transform transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         style={{ zIndex: 9999 }}
       >
-        <div className="p-4">
-          <h2 className="text-xl font-bold mb-4">Cart</h2>
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">Your Cart</h2>
+            <button
+              onClick={toggleDrawer}
+              className="text-gray-600 hover:text-gray-800 focus:outline-none"
+            >
+              &#10005;
+            </button>
+          </div>
 
           {/* Scrollable content */}
           <div className="overflow-y-auto" style={{ maxHeight: "70vh" }}>
             {arr.length > 0 ? (
               arr.map((item, index) => (
-                <div key={item.id} className="mb-2 flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <img src={item.image} alt={item.bookname} className="h-16 w-16 object-cover" />
-                  </div>
-                  <div>
-                    <div className="font-bold">{item.bookname}</div>
-                    <div className="text-gray-600">${item.price}</div>
-                    <div className="flex items-center mt-2">
+                <div
+                  key={item.id}
+                  className="mb-4 p-4 bg-gray-100 rounded-lg shadow-sm flex items-center space-x-4"
+                >
+                  <img
+                    src={item.image}
+                    alt={item.bookname}
+                    className="h-16 w-16 rounded object-cover"
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium text-lg">{item.bookname}</div>
+                    <div className="text-gray-500">${item.price.toFixed(2)}</div>
+                    <div className="flex items-center mt-2 space-x-2">
                       <button
                         onClick={() => handleDecrement(index)}
-                        className="bg-red-500 text-white px-2 py-1 rounded mr-2"
+                        className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded transition-colors duration-200"
                       >
                         -
                       </button>
-                      <span>{item.bookCount}</span>
+                      <span className="text-lg font-semibold">{item.quantity}</span>
                       <button
                         onClick={() => handleIncrement(index)}
-                        className="bg-green-500 text-white px-2 py-1 rounded ml-2"
+                        className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded transition-colors duration-200"
                       >
                         +
                       </button>
@@ -84,16 +131,22 @@ const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
                 </div>
               ))
             ) : (
-              <p>Your cart is empty.</p>
+              <p className="text-gray-600">Your cart is empty.</p>
             )}
           </div>
 
           {arr.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-300">
-              <div className="flex justify-between font-bold text-lg">
+            <div className="mt-6 pt-4 border-t border-gray-300">
+              <div className="flex justify-between text-xl font-semibold mb-4">
                 <span>Total:</span>
                 <span>${totalPrice.toFixed(2)}</span>
               </div>
+              <button
+                onClick={handleCheckout}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200"
+              >
+                Checkout
+              </button>
             </div>
           )}
         </div>

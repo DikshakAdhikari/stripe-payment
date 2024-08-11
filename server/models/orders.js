@@ -15,8 +15,6 @@ const productModel= new mongoose.Schema({
     description:{
         type:"String",
         required:false,
-      
-     
     },
     price:{
         type: Number,
@@ -46,7 +44,8 @@ const orderSchema= new mongoose.Schema({
         type:String
     },
     deliveryStatus:{
-        type:String
+        type:String,
+        default:"none"
     },
     createDate:{
         type:Date,
@@ -62,6 +61,11 @@ const orderSchema= new mongoose.Schema({
     address: {
         type:String,
         required:false
+    },
+    userId: {
+        type:mongoose.Schema.ObjectId,
+        ref:"User",
+        required:true
     }
 },{timestamps:true})
 

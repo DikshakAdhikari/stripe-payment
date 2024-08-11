@@ -41,7 +41,7 @@ const HomePage = () => {
     setArr((prev) => {
       const b = [...prev];
       //@ts-ignore
-      b.push({ bookname: beer.bookname, price: beer.price, image: beer.image, bookCount:1 });
+      b.push({ bookname: beer.bookname, price: beer.price, image: beer.image, quantity:1 });
       return b;
     });
     setCount(count + 1);

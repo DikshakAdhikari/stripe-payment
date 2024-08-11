@@ -18,17 +18,16 @@ const totalItemsPrice= (items)=> {
     return Math.floor(total)
 }
 
-orderRouter.post('/create-payment', async(req,res)=> {
+orderRouter.post('/create-payment', verifyToken, async(req,res)=> {
         try{
             const id= '33434'
             const {items , address }= req.body;
-            let payment_intent_id='pi_3PmDVTHaMXngjvdd0RK7QXdF'
             const totalAmount=  totalItemsPrice(items)*100
             const orderData= {
                 amount: totalAmount,
                 currency:"usd",
                 status:"incomplete",
-                deliveryStatus:"pending",
+                deliveryStatus:"none",
                 paymentIntentId: payment_intent_id ,
                 products:items,
                 address: address
