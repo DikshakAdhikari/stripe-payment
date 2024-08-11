@@ -1,4 +1,5 @@
 "use client"
+import { BASE_URL } from '@/app/(Components)/base';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 
@@ -11,7 +12,7 @@ const Login = () => {
   const handleLogin=async(e)=>{
     e.preventDefault();
     try {
-      const res=await fetch("http://localhost:3002/user/login",{
+      const res=await fetch(`${BASE_URL}/user/login`,{
         method:"POST",
         // credentials:"include",
         headers:{

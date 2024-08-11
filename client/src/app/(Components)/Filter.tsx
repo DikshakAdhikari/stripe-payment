@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { BASE_URL } from "./base";
 //@ts-ignore
 const Filter = ({setData,currentItems}) => {
   const [categories, setCategories] = useState({
@@ -60,7 +61,7 @@ const Filter = ({setData,currentItems}) => {
     console.log(str);
     
     try {
-      const res=await fetch(`http://localhost:3002/books/allBooks?category=${str}`,{
+      const res=await fetch(`${BASE_URL}/books/allBooks?category=${str}`,{
         method:"GET"
       })
       const data=await res.json();
