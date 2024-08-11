@@ -41,7 +41,7 @@ const HomePage = () => {
     setArr((prev) => {
       const b = [...prev];
       //@ts-ignore
-      b.push({ bookname: beer.bookname, price: beer.price, image: beer.image });
+      b.push({ bookname: beer.bookname, price: beer.price, image: beer.image, bookCount:1 });
       return b;
     });
     setCount(count + 1);
@@ -64,7 +64,7 @@ const HomePage = () => {
 
   return (
     <div>
-      <Navbar count={count} setCount={setCount} arr={arr} />
+      <Navbar count={count} setCount={setCount} arr={arr} setArr={setArr} />
       <div className="flex h-[100vh]">
         <div className="w-[15%] p-6 bg-gray-100">
           <Filter setData={setData} currentItems={currentItems} />

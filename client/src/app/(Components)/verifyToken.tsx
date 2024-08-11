@@ -1,3 +1,4 @@
+import { BASE_URL } from "./base";
 
 export const verifyToken = async ()=> {
     try{
@@ -5,7 +6,7 @@ export const verifyToken = async ()=> {
     
     const token= localStorage.getItem('token')
     if(token){
-        const res= await fetch('http://localhost:3002/user/validateToken', {
+        const res= await fetch(`${BASE_URL}/user/validateToken`, {
             headers:{
                 'Content-Type':'application/json',
                 'authorization': token
@@ -21,6 +22,7 @@ export const verifyToken = async ()=> {
     }
 }catch(err){
     // console.log(err);
+    alert("Invalid Token!")
     localStorage.clear()
     
 }

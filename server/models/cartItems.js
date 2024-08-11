@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
-const bookSchema=new mongoose.Schema({
+const cartSchema=new mongoose.Schema({
     bookname:{
         type:"String",
         required:true,
@@ -26,8 +26,16 @@ const bookSchema=new mongoose.Schema({
         required:true
 
     },
+    quantity:{
+        type:Number,
+        required:true,
+    },
     //who created the books?
-    
+    userId: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+        required: true,
+      },
 })
 
-export default mongoose.model("Books",bookSchema)
+export default mongoose.model("Books",cartSchema)
