@@ -1,5 +1,6 @@
 import React from "react";
 import { BASE_URL } from "./base";
+import { useRouter } from "next/navigation";
 
 interface Book {
   id: number;
@@ -18,7 +19,9 @@ interface CartProps {
 }
 
 const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
-  // Calculate total price based on quantities
+  
+  const router= useRouter()
+
   const totalPrice = arr.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   // Handle increment for a specific book
@@ -49,7 +52,9 @@ const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
   // Handle checkout action
   const handleCheckout = async() => {
     try{
-      console.log(totalPrice);
+      // @ts-ignore
+      const output= JSON.parse(localStorage.getItem("paymentIntentId"))
+      
       
       const res= await fetch(`${BASE_URL}/orders/create-payment`,{
         method:"POST",
@@ -58,7 +63,7 @@ const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
           'Content-Type':"application/json",
           "authorization": localStorage.getItem('token')
         },
-        body:JSON.stringify({items:arr, amount:totalPrice})
+        body:JSON.stringify({items:arr, amount:totalPrice, payment_intent_id :(output? output.id : null)})
       });
   
       if(!res.ok){
@@ -67,8 +72,8 @@ const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
       
       const data = await res.json()
       console.log(data);
-      console.log(data);
-      
+      localStorage.setItem("paymentIntentId", JSON.stringify(data))
+      router.push('/checkout')
     }catch(err){
       console.log(err);
       

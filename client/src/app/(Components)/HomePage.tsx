@@ -8,7 +8,7 @@ import Pagination from "./Pagination";
 const HomePage = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
+  const itemsPerPage = 10;
 
   const [count, setCount] = useState(0);
   const [storedBeer, setBeer] = useState({});
@@ -16,6 +16,7 @@ const HomePage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [arr, setArr] = useState([]);
   const [loggedIn, setIsLoggedIn] = useState(false);
+  const [getDisable, setDisable]= useState([])
 
   const fetchData = async () => {
     try {
@@ -23,6 +24,10 @@ const HomePage = () => {
         method: "GET",
       });
       const result = await res.json();
+      console.log(result);
+      const arr= new Array(result.length).fill(false)
+      // @ts-ignore
+      setDisable(arr)
       setData(result);
     } catch (error) {
       console.error(error);
@@ -37,11 +42,18 @@ const HomePage = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
 //@ts-ignore
-  const handleAdd = (beer) => {
+  const handleAdd = (beer, index) => {
     setArr((prev) => {
       const b = [...prev];
       //@ts-ignore
       b.push({ bookname: beer.bookname, price: beer.price, image: beer.image, quantity:1 });
+      // @ts-ignore
+      setDisable((prev)=> {
+        let newArr= [...prev]
+        // @ts-ignore
+        prev[index]= true
+        return prev;
+      })
       return b;
     });
     setCount(count + 1);
@@ -94,37 +106,8 @@ const HomePage = () => {
                       {/* @ts-ignore*/}
                     ${beer.price}
                   </p>
-                  {/* {loggedIn && (
-                    <div className="mt-6 flex justify-between items-center">
-                      <button
-                        onClick={() => handleDelete(beer.id)}
-                        className="px-4 py-2 bg-red-500 text-white rounded shadow-md hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
-                      <button
-                        onClick={() => handleUpdate(beer, index)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded shadow-md hover:bg-blue-600"
-                      >
-                        Update
-                      </button>
-                    </div>
-                  )} */}
-                  <div className="absolute bottom-2 right-2 flex items-center gap-1">
-
-                    <button onClick={() => handleAdd(beer)} className=" bg-blue-600 p-3 rounded-lg text-white">Add To Cart</button>
-                    {/* <button
-                      className="px-2 py-0 bg-gray-300 text-gray-700 rounded shadow-md hover:bg-gray-400"
-                      onClick={handleSub}
-                    >
-                      -
-                    </button>
-                    <button
-                      onClick={() => handleAdd(beer)}
-                      className="px-2 py-0 bg-green-500 text-white rounded shadow-md hover:bg-green-600"
-                    >
-                      +
-                    </button> */}
+                  <div className={` absolute bottom-2 right-2 flex items-center gap-1`}>
+                    <button disabled={getDisable[index] && true} onClick={() => handleAdd(beer, index)} className={`  ${getDisable[index] ? 'bg-gray-600' : "bg-blue-600"} bg-blue-600 p-3 rounded-lg text-white`}> {getDisable[index] ? "Added to Cart" : "Add To Cart" } </button>
                   </div>
                 </div>
               </div>

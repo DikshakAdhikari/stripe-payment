@@ -22,16 +22,19 @@ orderRouter.post('/create-payment', verifyToken, async(req,res)=> {
         try{
             const userId= req.clientId
             console.log(userId);
-            const {items , address }= req.body;
+            const {items , address, payment_intent_id }= req.body;
+            console.log(payment_intent_id);
+          
             const totalAmount=  totalItemsPrice(items)*100
             const orderData= {
                 amount: totalAmount,
                 currency:"usd",
                 status:"incomplete",
                 deliveryStatus:"none",
-                paymentIntentId: payment_intent_id ,
+                paymentIntentId: payment_intent_id ?  payment_intent_id : null ,
                 products:items,
-                address: address
+                address: address?address:null,
+                userId: userId
             }
             
             if(payment_intent_id){
@@ -61,7 +64,8 @@ orderRouter.post('/create-payment', verifyToken, async(req,res)=> {
                       if(!existingOrder){
                         return res.status(400).json({error:"Invalid Intent Id!"})
                       }
-                      res.json({paymentIntent: updated_intent })
+                      console.log(updated_intent);
+                      res.json(updated_intent)
                   }             
                 
             }else{
@@ -72,19 +76,18 @@ orderRouter.post('/create-payment', verifyToken, async(req,res)=> {
                       enabled: true,
                     },
                 });
-    
+                
                 orderData.paymentIntentId= paymentIntent.id
                 console.log(orderData);
                 const order= await orders.create(orderData)
                 await order.save()
-
                 res.json(paymentIntent)
 
             }
             
             
     }catch(err){
-        console.log('damnnn');
+        console.log(err);
         res.json({message:err})
     }
 } )

@@ -17,13 +17,15 @@ export const verifyToken = async ()=> {
         }
 
         const data= await res.json()
+        console.log(data);
+        
     }else{
-        localStorage.clear()
+        localStorage.removeItem("token")
     }
 }catch(err){
     // console.log(err);
     alert("Invalid Token!")
-    localStorage.clear()
+    localStorage.removeItem("token")
     
 }
 }
