@@ -8,7 +8,7 @@ import orderRouter from "./routes/orders.js";
 dotenv.config();
 
 const app=express();
-app.use(cors('http://localhost:3000'));
+app.use(cors({ origin: "*", methods: ["GET", "POST", "DELETE", "PUT"] }));
 app.use(express.json());
 
 
