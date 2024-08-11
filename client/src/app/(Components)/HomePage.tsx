@@ -4,6 +4,7 @@ import Navbar from "./Navbar";
 import Modal from "./Modal";
 import Filter from "./Filter";
 import Pagination from "./Pagination";
+import { BASE_URL } from "./base";
 
 const HomePage = () => {
   const [data, setData] = useState([]);
@@ -20,7 +21,7 @@ const HomePage = () => {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("http://localhost:3002/books/allBooks", {
+      const res = await fetch(`${BASE_URL}/books/allBooks`, {
         method: "GET",
       });
       const result = await res.json();
