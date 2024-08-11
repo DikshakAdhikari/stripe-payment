@@ -20,7 +20,8 @@ const totalItemsPrice= (items)=> {
 
 orderRouter.post('/create-payment', verifyToken, async(req,res)=> {
         try{
-            const id= '33434'
+            const userId= req.clientId
+            console.log(userId);
             const {items , address }= req.body;
             const totalAmount=  totalItemsPrice(items)*100
             const orderData= {
