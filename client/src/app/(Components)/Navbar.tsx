@@ -15,8 +15,13 @@ const Navbar = () => {
   const token=  localStorage.getItem('token')
   const router= useRouter()  
   const handleOpen = () => {
-    dispatch(reset())
-    setIsCartOpen(!isCartOpen);
+    
+    if(token){
+      dispatch(reset())
+      setIsCartOpen(!isCartOpen);
+    }else{
+      router.push('/login')
+    }
   };
 
   return (
@@ -35,7 +40,7 @@ const Navbar = () => {
           </div>
         )}
       </div>
-      {isCartOpen &&  <Cart isOpen={isCartOpen} toggleDrawer={handleOpen} />}
+      {(isCartOpen && token) && <Cart isOpen={isCartOpen} toggleDrawer={handleOpen} />}
     </div>
   );
 };

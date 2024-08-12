@@ -1,7 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect,  useState } from "react";
 import Navbar from "./Navbar";
-import Modal from "./Modal";
 import Filter from "./Filter";
 import Pagination from "./Pagination";
 import { BASE_URL } from "./base";
@@ -14,17 +13,11 @@ const HomePage = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [count, setCount] = useState(0);
-  const [storedBeer, setBeer] = useState({});
-  const [getindex, setIndex] = useState(-1);
-  const [isOpen, setIsOpen] = useState(false);
-  const [arr, setArr] = useState([]);
-  const [loggedIn, setIsLoggedIn] = useState(false);
   const [getDisable, setDisable]= useState([])
   const dispatch: AppDispatch = useDispatch();
  
   
-  const fetchData = async () => {
+  const fetchData = useCallback( async () => {
     try {
       const res = await fetch(`${BASE_URL}/books/allBooks`, {
         method: "GET",
@@ -37,7 +30,7 @@ const HomePage = () => {
     } catch (error) {
       console.error(error);
     }
-  };
+  },[])
 
   useEffect(() => {
     fetchData();
@@ -106,21 +99,6 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-      <Pagination
-        data={data}
-        itemsPerPage={itemsPerPage}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-      />
-      {isOpen && (
-        <Modal
-          storedBeer={storedBeer}
-          setData={setData}
-          getindex={getindex}
-          data={data}
-          setIsOpen={setIsOpen}
-        />
-      )}
     </div>
   );
 };
