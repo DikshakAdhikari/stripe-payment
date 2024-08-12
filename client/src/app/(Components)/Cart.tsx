@@ -21,16 +21,14 @@ interface CartProps {
 const Cart = ({ isOpen, toggleDrawer }: CartProps) => {
   const router= useRouter()
   const dispatch: AppDispatch = useDispatch();
-  const books = useSelector((state: RootState) => state.books);
-
-  console.log(books);
+  const cartBooks = useSelector((state: RootState) => state.books);
   
   
-  const totalPrice = books.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalPrice = cartBooks.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   // Handle increment for a specific book
   const handleIncrement = (index: number) => {
-    const updatedArr = books.map((item, idx) =>
+    const updatedArr = cartBooks.map((item, idx) =>
       idx === index ? { ...item, quantity: item.quantity + 1 } : item
     );
     dispatch(setBooks(updatedArr))
@@ -39,7 +37,7 @@ const Cart = ({ isOpen, toggleDrawer }: CartProps) => {
 
   // Handle decrement for a specific book
   const handleDecrement = (index: number) => {
-    const updatedArr = books
+    const updatedArr = cartBooks
       .map((item, idx) => {
         if (idx === index) {
           const newCount = item.quantity - 1;
@@ -57,26 +55,27 @@ const Cart = ({ isOpen, toggleDrawer }: CartProps) => {
   const handleCheckout = async() => {
     try{
       // @ts-ignore
-      const output= JSON.parse(localStorage.getItem("paymentIntentId"))
+      // const output= JSON.parse(localStorage.getItem("paymentIntentId"))
       
       
-      const res= await fetch(`${BASE_URL}/orders/create-payment`,{
-        method:"POST",
-        // @ts-ignore
-        headers:{
-          'Content-Type':"application/json",
-          "authorization": localStorage.getItem('token')
-        },
-        body:JSON.stringify({items:books, amount:totalPrice, payment_intent_id :(output? output.id : null)})
-      });
+      // const res= await fetch(`${BASE_URL}/orders/create-payment`,{
+      //   method:"POST",
+      //   // @ts-ignore
+      //   headers:{
+      //     'Content-Type':"application/json",
+      //     "authorization": localStorage.getItem('token')
+      //   },
+      //   body:JSON.stringify({items:cartBooks, amount:totalPrice, payment_intent_id :(output? output.id : null)})
+      // });
   
-      if(!res.ok){
-        throw new Error("Network problem!")
-      }
+      // if(!res.ok){
+      //   throw new Error("Network problem!")
+      // }
       
-      const data = await res.json()
-      console.log(data);
-      localStorage.setItem("paymentIntentId", JSON.stringify(data))
+      // const data = await res.json()
+      // console.log(data);
+      // localStorage.setItem("paymentIntentId", JSON.stringify(data))
+      // localStorage.setItem("amount", JSON.stringify(totalPrice))
       router.push('/checkout')
     }catch(err){
       console.log(err);
@@ -107,8 +106,8 @@ const Cart = ({ isOpen, toggleDrawer }: CartProps) => {
 
           {/* Scrollable content */}
           <div className="overflow-y-auto" style={{ maxHeight: "70vh" }}>
-            {books.length > 0 ? (
-              books.map((item, index) => (
+            {cartBooks.length > 0 ? (
+              cartBooks.map((item, index) => (
                 <div
                 // @ts-ignore
                   key={item.id}
@@ -145,7 +144,7 @@ const Cart = ({ isOpen, toggleDrawer }: CartProps) => {
             )}
           </div>
 
-          {books.length > 0 && (
+          {cartBooks.length > 0 && (
             <div className="mt-6 pt-4 border-t border-gray-300">
               <div className="flex justify-between text-xl font-semibold mb-4">
                 <span>Total:</span>
