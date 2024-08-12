@@ -5,12 +5,15 @@ import Modal from "./Modal";
 import Filter from "./Filter";
 import Pagination from "./Pagination";
 import { BASE_URL } from "./base";
+import { AppDispatch, RootState } from "./GlobalRedux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { addBook } from "./GlobalRedux/Features/BookSlice";
+import { increment } from "./GlobalRedux/Features/CounterSlice";
 
 const HomePage = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
   const [count, setCount] = useState(0);
   const [storedBeer, setBeer] = useState({});
   const [getindex, setIndex] = useState(-1);
@@ -18,14 +21,15 @@ const HomePage = () => {
   const [arr, setArr] = useState([]);
   const [loggedIn, setIsLoggedIn] = useState(false);
   const [getDisable, setDisable]= useState([])
-
+  const dispatch: AppDispatch = useDispatch();
+ 
+  
   const fetchData = async () => {
     try {
       const res = await fetch(`${BASE_URL}/books/allBooks`, {
         method: "GET",
       });
       const result = await res.json();
-      console.log(result);
       const arr= new Array(result.length).fill(false)
       // @ts-ignore
       setDisable(arr)
@@ -41,43 +45,29 @@ const HomePage = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = data?.slice(indexOfFirstItem, indexOfLastItem);
 //@ts-ignore
   const handleAdd = (beer, index) => {
-    setArr((prev) => {
-      const b = [...prev];
-      //@ts-ignore
-      b.push({ bookname: beer.bookname, price: beer.price, image: beer.image, quantity:1 });
-      // @ts-ignore
+
       setDisable((prev)=> {
         let newArr= [...prev]
         // @ts-ignore
-        prev[index]= true
-        return prev;
+        newArr[index]= true
+        return newArr;
       })
-      return b;
-    });
-    setCount(count + 1);
+
+
+      //@ts-ignore
+      dispatch(addBook({bookname: beer.bookname, price: beer.price, image: beer.image, quantity:1}));
+
+
+    dispatch(increment())
   };
 
-  const handleSub = () => {
-    setCount(count > 0 ? count - 1 : 0);
-  };
-//@ts-ignore
-  const handleDelete = (id) => {
-    //@ts-ignore
-    setData((prev) => prev.filter((item) => item.id !== id));
-  };
-//@ts-ignore
-  const handleUpdate = (beer, index) => {
-    setBeer(beer);
-    setIndex(index);
-    setIsOpen(true);
-  };
 
   return (
     <div>
-      <Navbar count={count} setCount={setCount} arr={arr} setArr={setArr} />
+      <Navbar  />
       <div className="flex h-[100vh]">
         <div className="w-[15%] p-6 bg-gray-100">
           <Filter setData={setData} currentItems={currentItems} />

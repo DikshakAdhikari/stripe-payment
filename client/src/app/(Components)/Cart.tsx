@@ -1,6 +1,9 @@
 import React from "react";
 import { BASE_URL } from "./base";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "./GlobalRedux/store";
+import { setBooks } from "./GlobalRedux/Features/BookSlice";
 
 interface Book {
   id: number;
@@ -13,29 +16,30 @@ interface Book {
 interface CartProps {
   isOpen: boolean;
   toggleDrawer: () => void;
-  arr: Book[];
-  setArr: React.Dispatch<React.SetStateAction<Book[]>>;
-  setCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
-  
+const Cart = ({ isOpen, toggleDrawer }: CartProps) => {
   const router= useRouter()
+  const dispatch: AppDispatch = useDispatch();
+  const books = useSelector((state: RootState) => state.books);
 
-  const totalPrice = arr.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  console.log(books);
+  
+  
+  const totalPrice = books.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   // Handle increment for a specific book
   const handleIncrement = (index: number) => {
-    const updatedArr = arr.map((item, idx) =>
+    const updatedArr = books.map((item, idx) =>
       idx === index ? { ...item, quantity: item.quantity + 1 } : item
     );
-    setArr(updatedArr);
-    setCount((prevCount) => prevCount + 1); // Update total count if needed
+    dispatch(setBooks(updatedArr))
+
   };
 
   // Handle decrement for a specific book
   const handleDecrement = (index: number) => {
-    const updatedArr = arr
+    const updatedArr = books
       .map((item, idx) => {
         if (idx === index) {
           const newCount = item.quantity - 1;
@@ -45,8 +49,8 @@ const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
       })
       .filter((item) => item.quantity > 0); // Filter out items with 0 count
 
-    setArr(updatedArr);
-    setCount(updatedArr.reduce((acc, item) => acc + item.quantity, 0)); // Update total count
+      dispatch(setBooks(updatedArr))
+    // setArr(updatedArr);
   };
 
   // Handle checkout action
@@ -63,7 +67,7 @@ const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
           'Content-Type':"application/json",
           "authorization": localStorage.getItem('token')
         },
-        body:JSON.stringify({items:arr, amount:totalPrice, payment_intent_id :(output? output.id : null)})
+        body:JSON.stringify({items:books, amount:totalPrice, payment_intent_id :(output? output.id : null)})
       });
   
       if(!res.ok){
@@ -103,9 +107,10 @@ const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
 
           {/* Scrollable content */}
           <div className="overflow-y-auto" style={{ maxHeight: "70vh" }}>
-            {arr.length > 0 ? (
-              arr.map((item, index) => (
+            {books.length > 0 ? (
+              books.map((item, index) => (
                 <div
+                // @ts-ignore
                   key={item.id}
                   className="mb-4 p-4 bg-gray-100 rounded-lg shadow-sm flex items-center space-x-4"
                 >
@@ -140,7 +145,7 @@ const Cart = ({ isOpen, toggleDrawer, arr, setArr, setCount }: CartProps) => {
             )}
           </div>
 
-          {arr.length > 0 && (
+          {books.length > 0 && (
             <div className="mt-6 pt-4 border-t border-gray-300">
               <div className="flex justify-between text-xl font-semibold mb-4">
                 <span>Total:</span>
