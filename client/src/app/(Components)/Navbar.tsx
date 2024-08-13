@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import bg from "../../../public/image.png";
 import Cart from "./Cart";
 import { useRouter } from "next/navigation";
@@ -13,10 +13,12 @@ const Navbar = () => {
   const cartCount = useSelector((state: RootState) => state.count);
   const [token, setToken]= useState<string|null>(null)
   const dispatch: AppDispatch = useDispatch();
-
   const router= useRouter()  
-  const handleOpen = () => {
+
+  useEffect(()=> {
     setToken(localStorage.getItem('token'))
+  },[])
+  const handleOpen = () => {
     if(token){
       dispatch(reset())
       setIsCartOpen(!isCartOpen);

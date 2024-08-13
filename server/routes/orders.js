@@ -25,8 +25,7 @@ orderRouter.post('/create-payment', verifyToken, async(req,res)=> {
             const {items , address,  payment_intent_id }= req.body;
           
             const totalAmount=  totalItemsPrice(items)*100
-            console.log(totalAmount);
-            console.log(totalAmount);
+         
             const orderData= {
                 amount: totalAmount,
                 currency:"usd",
@@ -39,7 +38,6 @@ orderRouter.post('/create-payment', verifyToken, async(req,res)=> {
             }
             
             if(payment_intent_id){
-                console.log(payment_intent_id);
                 const current_intent = await stripe.paymentIntents.retrieve(
                     payment_intent_id
                   );

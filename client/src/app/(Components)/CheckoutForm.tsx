@@ -1,10 +1,14 @@
 "use client"
 
 import {useStripe, useElements, PaymentElement, AddressElement} from '@stripe/react-stripe-js';
+import { AppDispatch } from './GlobalRedux/store';
+import { useDispatch } from 'react-redux';
+import { resetBooks } from './GlobalRedux/Features/BookSlice';
+import { toast } from 'react-toastify';
 
 //@ts-ignore
-const CheckoutForm = ({clientSecret}) => {
-
+const CheckoutForm = ({clientSecret, setClientSecret,setCheckoutSuccess}) => {
+  const dispatch: AppDispatch = useDispatch();
     const stripe = useStripe();
     const elements = useElements();
   
@@ -23,19 +27,18 @@ const CheckoutForm = ({clientSecret}) => {
       const result = await stripe.confirmPayment({
         //`Elements` instance that was used to create the Payment Element
         elements,
-        confirmParams: {
-          return_url: "https://example.com/order/123/complete",
-        },
+        redirect:'if_required'
       });
-  
-      if (result.error) {
-        // Show error to your customer (for example, payment details incomplete)
-        console.log(result.error.message);
-      } else {
-        // Your customer will be redirected to your `return_url`. For some payment
-        // methods like iDEAL, your customer will be redirected to an intermediate
-        // site first to authorize the payment, then redirected to the `return_url`.
+      console.log(result);
+      if(!result.error){
+        toast.success("Checkout Successfull!")
+        dispatch(resetBooks())
+        setCheckoutSuccess(true)
+        setClientSecret(null)
+        localStorage.removeItem("paymentIntentId")
       }
+      
+     
     };
   return (
     <form onSubmit={handleSubmit} id='payment-form' className=' flex flex-col  justify-center gap-14 items-center '>

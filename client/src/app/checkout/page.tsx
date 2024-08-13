@@ -17,6 +17,7 @@ export default function App() {
   const cartBooks = useSelector((state: RootState) => state.books);
   const [clientSecret, setClientSecret]= useState(null)
   const [loading, setLoading]= useState(true)
+  const [checkoutSuccess, setCheckoutSuccess]= useState(false)
   const router= useRouter()
   
   const fun= useCallback(async()=> {
@@ -40,6 +41,8 @@ export default function App() {
         throw new Error("Network problem!")
       }
       const data = await res.json()
+      console.log(data);
+      
       setLoading(false)
       if( data?.message?.statusCode === 400){
         setLoading(false)
@@ -80,13 +83,18 @@ export default function App() {
     <>
     {/* @ts-ignore */}
     <Elements stripe={stripePromise} options={options}>
-      <CheckoutForm clientSecret={clientSecret} />
+      <CheckoutForm clientSecret={clientSecret} setClientSecret={setClientSecret} setCheckoutSuccess={setCheckoutSuccess} />
     </Elements>
     </>
     }
     <div>
       {
         loading && <div>Loading......</div>
+      }
+      {
+        checkoutSuccess && <div>
+          <button className=' bg-green-600 text-white p-3 rounded-md'>Check orders</button>
+        </div>
       }
     </div>
     </div>
