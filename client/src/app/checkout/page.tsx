@@ -41,8 +41,6 @@ export default function App() {
         throw new Error("Network problem!")
       }
       const data = await res.json()
-      console.log(data);
-      
       setLoading(false)
       if( data?.message?.statusCode === 400){
         setLoading(false)
