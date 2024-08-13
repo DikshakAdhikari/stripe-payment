@@ -11,11 +11,12 @@ import { reset } from "./GlobalRedux/Features/CounterSlice";
 const Navbar = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const cartCount = useSelector((state: RootState) => state.count);
+  const [token, setToken]= useState<string|null>(null)
   const dispatch: AppDispatch = useDispatch();
-  const token=  localStorage.getItem('token')
+
   const router= useRouter()  
   const handleOpen = () => {
-    
+    setToken(localStorage.getItem('token'))
     if(token){
       dispatch(reset())
       setIsCartOpen(!isCartOpen);

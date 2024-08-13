@@ -14,7 +14,7 @@ const totalItemsPrice= (items)=> {
     items.map((item)=> {
         total += (item.price*item.quantity)
     });
-    console.log(total);
+    
     return Math.floor(total)
 }
 
@@ -25,6 +25,7 @@ orderRouter.post('/create-payment', verifyToken, async(req,res)=> {
             const {items , address,  payment_intent_id }= req.body;
           
             const totalAmount=  totalItemsPrice(items)*100
+            console.log(totalAmount);
             console.log(totalAmount);
             const orderData= {
                 amount: totalAmount,
@@ -64,7 +65,7 @@ orderRouter.post('/create-payment', verifyToken, async(req,res)=> {
                       if(!existingOrder){
                         return res.status(400).json({error:"Invalid Intent Id!"})
                       }
-                      console.log(updated_intent);
+                      // console.log(updated_intent);
                       res.json(updated_intent)
                   }             
                 
@@ -78,7 +79,7 @@ orderRouter.post('/create-payment', verifyToken, async(req,res)=> {
                 });
                 
                 orderData.paymentIntentId= paymentIntent.id
-                console.log(orderData);
+                // console.log(orderData);
                 const order= await orders.create(orderData)
                 await order.save()
                 res.json(paymentIntent)

@@ -23,8 +23,7 @@ try {
     const matchPassword=await bcrypt.compare(password,loggedUser.password)
     //create a jwt token
     
-    const token=jwt.sign({userid:loggedUser._id,email:loggedUser.email},process.env.JWT_SECRET);
-    
+    const token=jwt.sign({userid:loggedUser._id,email:loggedUser.email},process.env.JWT_SECRET, {expiresIn:"2h"});
     res.json({token})
  
 } catch (error) {

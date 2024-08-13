@@ -39,9 +39,9 @@ const CheckoutForm = ({clientSecret}) => {
     };
   return (
     <form onSubmit={handleSubmit} id='payment-form' className=' flex flex-col  justify-center gap-14 items-center '>
-        <div className=' text-4xl text-gray-900 underline mb-4 font-bold'>E-Book Rental Checkout Form</div>
+      <div className=' mt-12 flex flex-col gap-6'>
         <h2 className=' font-semibold'>Address Information</h2>
-        <div className=' w-[40vw]'>
+        <div className=' w-[30vw]'>
         <AddressElement options={{
             mode:"shipping",
             allowedCountries:["US","IN"]
@@ -49,8 +49,9 @@ const CheckoutForm = ({clientSecret}) => {
     <div className=' flex flex-col gap-10'>
       <PaymentElement id='payment-element' options={{layout:"tabs"}}  />
       </div>
-      <div className=' text-3xl justify-end flex font-bold'>Total Price: $666.99  </div>
+      <div className=' text-3xl justify-end flex font-bold'>Total Price: ${localStorage.getItem('amount')}  </div>
       <button onClick={()=> {}} className=' bg-black text-white p-3 hover:bg-slate-900 rounded-md'>Submit</button>
+      </div>
       </div>
     </form>
   );

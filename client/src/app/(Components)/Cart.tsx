@@ -51,31 +51,11 @@ const Cart = ({ isOpen, toggleDrawer }: CartProps) => {
     // setArr(updatedArr);
   };
 
-  // Handle checkout action
+
   const handleCheckout = async() => {
     try{
-      // @ts-ignore
-      // const output= JSON.parse(localStorage.getItem("paymentIntentId"))
-      
-      
-      // const res= await fetch(`${BASE_URL}/orders/create-payment`,{
-      //   method:"POST",
-      //   // @ts-ignore
-      //   headers:{
-      //     'Content-Type':"application/json",
-      //     "authorization": localStorage.getItem('token')
-      //   },
-      //   body:JSON.stringify({items:cartBooks, amount:totalPrice, payment_intent_id :(output? output.id : null)})
-      // });
-  
-      // if(!res.ok){
-      //   throw new Error("Network problem!")
-      // }
-      
-      // const data = await res.json()
-      // console.log(data);
-      // localStorage.setItem("paymentIntentId", JSON.stringify(data))
-      // localStorage.setItem("amount", JSON.stringify(totalPrice))
+      const price=  totalPrice.toFixed(2)
+      localStorage.setItem("amount", JSON.stringify(totalPrice))
       router.push('/checkout')
     }catch(err){
       console.log(err);
