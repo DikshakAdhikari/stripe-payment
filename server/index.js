@@ -11,7 +11,7 @@ import { handleWebhook } from "./controllers/orders.js";
 dotenv.config();
 const app=express();
 app.use(cors({ origin: "*", methods: ["GET", "POST", "DELETE", "PUT"] }));
-app.post("/webhooks", express.raw({ type: "application/json" }),async(request, response) => {
+app.post("/webhook", express.raw({ type: "application/json" }),async(request, response) => {
     console.log('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
     const sig = request.headers["stripe-signature"];
 
@@ -34,7 +34,6 @@ app.post("/webhooks", express.raw({ type: "application/json" }),async(request, r
     }
 
     let session = "";
-
  
     switch (event.type) {
       case "checkout.session.async_payment_failed":
