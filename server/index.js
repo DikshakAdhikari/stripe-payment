@@ -20,7 +20,6 @@ app.post("/webhook", express.raw({ type: "application/json" }),async(request, re
       "https://drive.google.com/file/d/1K5LwwK-4875LMuT2978Yw8vr1MU0oPck/view?usp=drive_link";
 
     try {
-      
       event = stripe(process.env.STRIPE_PASSWORD).webhooks.constructEvent(
         request.body,
         sig,
