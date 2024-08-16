@@ -85,7 +85,7 @@ export const createPayment= async(req,res)=> {
 
         }     
 }catch(err){
-    console.log(err);
+    console.log('sssssssssssssssssssssssssss',err);
     res.json({message:err})
 }
 }

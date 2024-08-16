@@ -35,48 +35,24 @@ app.post("/webhook", express.raw({ type: "application/json" }),async(request, re
     let session = "";
  
     switch (event.type) {
-      case "checkout.session.async_payment_failed":
+      case 'payment_intent.canceled':
         session = event.data.object;
-        console.log(session);
-        
+        // Then define and call a function to handle the event payment_intent.canceled
         break;
-      case "checkout.session.completed":
+      case 'payment_intent.payment_failed':
         session = event.data.object;
-        console.log(session);
-        // Send invoice email using nodemailer
-        const emailTo = session.customer_details.email;
-
-        const transporter = nodemailer.createTransport({
-          host: "smtp.gmail.com",
-          port: 587,
-          secure: false,
-          auth: {
-            user: process.env.EMAIL,
-            pass: process.env.EMAIL_PASSWORD,
-          },
-        });
-
-        // async..await is not allowed in global scope, must use a wrapper
-        async function main() {
-          // Send mail with defined transport object
-          const info = await transporter.sendMail({
-            from: process.env.EMAIL, // sender address
-            to: emailTo, // list of receivers
-            subject: "Thanks for the payment for the product", // Subject line
-            text: "Thanks for the payment for the product", // Plain text body
-            html: `
-                      Hello ${session.customer_details.email}, thanks for the payment of the product.
-                      Here's the link to the product from Google Drive: ${product}. You can download the file by going to this link.
-                    `, // HTML body
-          });
-          // console.log("Message sent: %s", info.messageId);
-        }
-        main().catch(console.error);
+        // Then define and call a function to handle the event payment_intent.payment_failed
+        break;
+      case 'payment_intent.succeeded':
+        session = event.data.object;
+        // Then define and call a function to handle the event payment_intent.succeeded
         break;
       // ... handle other event types
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
+    
+    console.log(session);
 
     // Return a 200 response to acknowledge receipt of the event
     response.status(200).send();
