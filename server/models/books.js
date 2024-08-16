@@ -26,6 +26,10 @@ const bookSchema=new mongoose.Schema({
         required:true
 
     },
+    file:{
+        type:String,
+        required:false
+    }
     //who created the books?
     
 })

@@ -13,6 +13,7 @@ export const verifyToken = (req, res, next) => {
       }
 
       req.clientId = payload.userid;
+      req.email= payload.email;
       next();
     });
   } catch (error) {

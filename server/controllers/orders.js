@@ -22,7 +22,8 @@ const stripe = new Stripe(process.env.STRIPE_PASSWORD, {
 export const createPayment= async(req,res)=> {
     try{
         const userId= req.clientId
-     
+      
+      console.log('ffff',req.email);
         const {items , address,  payment_intent_id }= req.body;
       
         const totalAmount=  totalItemsPrice(items)*100
@@ -75,6 +76,7 @@ export const createPayment= async(req,res)=> {
                 automatic_payment_methods: {
                   enabled: true,
                 },
+                metadata: { userId: userId, email: req.email  }
             });
             
             orderData.paymentIntentId= paymentIntent.id
