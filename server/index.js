@@ -18,7 +18,7 @@ app.post("/webhook", express.raw({ type: "application/json" }),async(request, re
     const sig = request.headers["stripe-signature"];
 
     let event;
-    const product =
+    const productFile =
       "https://drive.google.com/file/d/1K5LwwK-4875LMuT2978Yw8vr1MU0oPck/view?usp=drive_link";
 
     try {
@@ -84,7 +84,7 @@ app.post("/webhook", express.raw({ type: "application/json" }),async(request, re
             text: "Thanks for the payment for the product", // Plain text body
             html: `
                       Hello ${session.metadata.email}, thanks for the payment of the product.
-                      Here's the link to the product from Google Drive: ${product}. You can download the file by going to this link.
+                      Here's the link to the product from Google Drive: ${productFile}. You can download the file by going to this link.
                     `, // HTML body
           });
           // console.log("Message sent: %s", info.messageId);
