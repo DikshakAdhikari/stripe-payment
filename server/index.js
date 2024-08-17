@@ -8,6 +8,8 @@ import orderRouter from "./routes/orders.js";
 import nodemailer from 'nodemailer'
 import stripe from 'stripe'
 import { handleWebhook } from "./controllers/orders.js";
+import orders from "./models/orders.js";
+import user from "./models/user.js";
 dotenv.config();
 const app=express();
 app.use(cors({ origin: "*", methods: ["GET", "POST", "DELETE", "PUT"] }));
@@ -46,8 +48,22 @@ app.post("/webhook", express.raw({ type: "application/json" }),async(request, re
       case 'payment_intent.succeeded':
         session = event.data.object;
         // Send invoice email using nodemailer
-        const emailTo = session.metadata.email;
+      const product = await orders.findOneAndUpdate(
+        { paymentIntentId: session.id },
+        { status: "success" },
+        { new: true }
+      );
 
+        const obj={
+          orderId: product.id,
+          products: product.products
+        }
+
+        const userData= await user.findOneAndUpdate({_id:session.metadata.userId}, {
+          $push:{myOrders:obj}
+        },{new:true})
+
+        const emailTo = session.metadata.email;
         const transporter = nodemailer.createTransport({
           host: "smtp.gmail.com",
           port: 587,
@@ -81,7 +97,7 @@ app.post("/webhook", express.raw({ type: "application/json" }),async(request, re
         console.log(`Unhandled event type ${event.type}`);
     }
 
-    console.log(session);
+
     // Return a 200 response to acknowledge receipt of the event
     response.status(200).send();
   }

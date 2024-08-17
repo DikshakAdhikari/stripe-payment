@@ -1,9 +1,13 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose, { mongo, Mongoose } from "mongoose";
 
 const productModel= new mongoose.Schema({
     bookname:{
         type:"String",
         required:false,
+    },
+    orderId:{
+        type:"String",
+
     },
     image:{
         type:"String",
@@ -18,6 +22,15 @@ const productModel= new mongoose.Schema({
         required:false
     }
 },{timestamps:true})
+
+const orderModel= new mongoose.Schema({
+    orderId:{
+        type:String
+    },
+    products:{
+        type: [productModel]
+    }
+})
 
 
 const userSchema=new mongoose.Schema({
@@ -41,7 +54,7 @@ const userSchema=new mongoose.Schema({
         default: 'user' 
       },
     myOrders:{
-        type:[productModel],
+        type:[orderModel],
         required:false
     }
 })
