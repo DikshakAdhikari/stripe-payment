@@ -22,8 +22,7 @@ const productModel= new mongoose.Schema({
         type:String,
         required:false,
         enum:['nonfiction','drama','fiction','comics'],
-       
-
+    
     },
     quantity:{
         type:Number,
