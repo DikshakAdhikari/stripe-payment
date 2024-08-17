@@ -41,7 +41,7 @@ const Filter = ({setData,currentItems}) => {
     // arr.push(category);
     // console.log(arr);
   };
-  console.log(categories);
+  // console.log(categories);
 
   const filteredProduct=async()=>{
     const arry=[]
@@ -58,7 +58,7 @@ const Filter = ({setData,currentItems}) => {
       str += ',';
     }
     
-    console.log(str);
+    // console.log(str);
     
     try {
       const res=await fetch(`${BASE_URL}/books/allBooks?category=${str}`,{
