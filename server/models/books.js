@@ -26,9 +26,9 @@ const bookSchema=new mongoose.Schema({
         required:true
 
     },
-    file:{
+    fileId:{
         type:String,
-        required:true
+        required:false
     }
     
 })

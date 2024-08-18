@@ -16,6 +16,7 @@ const HomePage = () => {
   const [getDisable, setDisable]= useState([])
   const dispatch: AppDispatch = useDispatch();
  
+  console.log(data);
   
   const fetchData = useCallback( async () => {
     try {
@@ -51,7 +52,7 @@ const HomePage = () => {
 
 
       //@ts-ignore
-      dispatch(addBook({bookname: beer.bookname, price: beer.price, image: beer.image, quantity:1}));
+      dispatch(addBook({bookname: beer.bookname, price: beer.price, image: beer.image, quantity:1, fileId:beer.fileId}));
 
 
     dispatch(increment())

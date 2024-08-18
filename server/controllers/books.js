@@ -1,8 +1,14 @@
 import Books from "../models/books.js";
+import files from "../models/files.js";
 export const createBook = async (req, res) => {
   try {
     const { bookname, image, description, price, genre, file } = req.body;
     const userId = req.clientId;
+
+    const newFile= await files.create({
+      file:file
+    })
+    const savedFile= await newFile.save()
 
     const newBook = await Books.create({
       bookname,
@@ -11,8 +17,9 @@ export const createBook = async (req, res) => {
       price,
       userId,
       genre,
-      file
+      fileId:savedFile._id
     });
+   await newBook.save()
     res.json(newBook);
   } catch (error) {
     console.log(error);

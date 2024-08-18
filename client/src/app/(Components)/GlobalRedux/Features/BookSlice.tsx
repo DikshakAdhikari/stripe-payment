@@ -8,6 +8,7 @@ interface Book {
   price: number;
   genre: string;
   quantity: number;
+  fileId: string;
 }
 
 // Define the initial state using that type

@@ -24,6 +24,10 @@ const productModel= new mongoose.Schema({
         enum:['nonfiction','drama','fiction','comics'],
     
     },
+    fileId:{
+        type:String,
+        required:false
+    },
     quantity:{
         type:Number,
         required:false

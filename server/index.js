@@ -10,6 +10,7 @@ import stripe from 'stripe'
 import { handleWebhook } from "./controllers/orders.js";
 import orders from "./models/orders.js";
 import user from "./models/user.js";
+import files from "./models/files.js";
 dotenv.config();
 const app=express();
 app.use(cors({ origin: "*", methods: ["GET", "POST", "DELETE", "PUT"] }));
@@ -48,15 +49,26 @@ app.post("/webhook", express.raw({ type: "application/json" }),async(request, re
       case 'payment_intent.succeeded':
         session = event.data.object;
         // Send invoice email using nodemailer
-      const product = await orders.findOneAndUpdate(
+      const updatedProduct = await orders.findOneAndUpdate(
         { paymentIntentId: session.id },
         { status: "success" },
         { new: true }
       );
 
+      // console.log(product);
+      // for(let i=0;i<updatedProduct.products.length; i++){
+      //   const fileId= 
+      // }
+      const filesUrls=[]
+      await Promise.all(updatedProduct.products.map(async(val, i)=>{
+        console.log(val.fileId);
+        const fileData= await files.findOne({_id:val.fileId})
+        filesUrls.push(fileData.file)
+      }))
+
         const obj={
-          orderId: product.id,
-          products: product.products
+          orderId: updatedProduct.id,
+          products: updatedProduct.products
         }
 
         const userData= await user.findOneAndUpdate({_id:session.metadata.userId}, {
@@ -83,11 +95,13 @@ app.post("/webhook", express.raw({ type: "application/json" }),async(request, re
             subject: "Thanks for the payment for the product", // Subject line
             text: "Thanks for the payment for the product", // Plain text body
             html: `
-                      Hello ${session.metadata.email}, thanks for the payment of the product.
-                      Here's the link to the product from Google Drive: ${productFile}. You can download the file by going to this link.
-                    `, // HTML body
+              Hello ${session.metadata.email}, thanks for the payment of the product.<br />
+              Here's the link to the Books from Google Drive. You can download the files by visiting these links:<br />
+              ${filesUrls.map((val) => `<a href="${val}">${val}</a>`).join('<br />')}
+            `, // HTML body
           });
-          // console.log("Message sent: %s", info.messageId);
+          
+          console.log("Message sent: %s", info.messageId);
         }
         main().catch(console.error);
         // Then define and call a function to handle the event payment_intent.succeeded

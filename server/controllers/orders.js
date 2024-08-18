@@ -25,7 +25,6 @@ export const createPayment= async(req,res)=> {
       
       console.log('ffff',req.email);
         const {items , address,  payment_intent_id }= req.body;
-      
         const totalAmount=  totalItemsPrice(items)*100
      
         const orderData= {
