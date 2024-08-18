@@ -7,6 +7,5 @@ import { createPayment, handleWebhook } from '../controllers/orders.js';
 const orderRouter= express.Router();
 
 orderRouter.post('/create-payment', verifyToken, createPayment )
-// orderRouter.post("/webhooks", handleWebhook);
 
 export default orderRouter

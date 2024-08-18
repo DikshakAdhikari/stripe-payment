@@ -26,7 +26,7 @@ const bookSchema=new mongoose.Schema({
         required:true
 
     },
-    file:{
+    fileUrl:{
         type:String,
         required:true
     }
