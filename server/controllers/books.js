@@ -1,7 +1,7 @@
 import Books from "../models/books.js";
 export const createBook = async (req, res) => {
   try {
-    const { bookname, image, description, price, genre } = req.body;
+    const { bookname, image, description, price, genre, file } = req.body;
     const userId = req.clientId;
 
     const newBook = await Books.create({
@@ -11,6 +11,7 @@ export const createBook = async (req, res) => {
       price,
       userId,
       genre,
+      file
     });
     res.json(newBook);
   } catch (error) {
