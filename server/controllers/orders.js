@@ -2,11 +2,13 @@ import nodemailer from 'nodemailer'
 import dotenv from 'dotenv'
 import Stripe from 'stripe';
 import orders from '../models/orders.js';
+import user from '../models/user.js';
+import files from '../models/files.js';
+import stripe from 'stripe'
 dotenv.config()
 
-const stripe = new Stripe(process.env.STRIPE_PASSWORD, {
+const stripeFunction = new Stripe(process.env.STRIPE_PASSWORD, {
     apiVersion: '2024-06-20'
-
   });
 
   const totalItemsPrice= (items)=> {
@@ -22,8 +24,6 @@ const stripe = new Stripe(process.env.STRIPE_PASSWORD, {
 export const createPayment= async(req,res)=> {
     try{
         const userId= req.clientId
-      
-      console.log('ffff',req.email);
         const {items , address,  payment_intent_id }= req.body;
         const totalAmount=  totalItemsPrice(items)*100
      
@@ -39,12 +39,12 @@ export const createPayment= async(req,res)=> {
         }
         
         if(payment_intent_id){
-            const current_intent = await stripe.paymentIntents.retrieve(
+            const current_intent = await stripeFunction.paymentIntents.retrieve(
                 payment_intent_id
               );
             //   console.log('current Intent:e ', current_intent);
               if(current_intent){
-                const updated_intent = await stripe.paymentIntents.update(
+                const updated_intent = await stripeFunction.paymentIntents.update(
                     payment_intent_id,
                     {amount:totalAmount}
                   );
@@ -69,7 +69,7 @@ export const createPayment= async(req,res)=> {
               }             
             
         }else{
-            const paymentIntent = await stripe.paymentIntents.create({
+            const paymentIntent = await stripeFunction.paymentIntents.create({
                 amount: totalAmount,
                 currency: 'usd',
                 automatic_payment_methods: {
@@ -79,14 +79,12 @@ export const createPayment= async(req,res)=> {
             });
             
             orderData.paymentIntentId= paymentIntent.id
-            // console.log(orderData);
             const order= await orders.create(orderData)
             await order.save()
             res.json(paymentIntent)
 
         }     
 }catch(err){
-    console.log('sssssssssssssssssssssssssss',err);
     res.json({message:err})
 }
 }
@@ -94,75 +92,94 @@ export const createPayment= async(req,res)=> {
 
 
 export const handleWebhook = async(request,response)=>{
-  console.log('rrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
-   
-      const sig = request.headers["stripe-signature"];
   
-      let event;
-      const product =
-        "https://drive.google.com/file/d/1K5LwwK-4875LMuT2978Yw8vr1MU0oPck/view?usp=drive_link";
+  console.log('Webhook Called!!!!!!!!!');
+
+  const sig = request.headers["stripe-signature"];
+  let event;
+
+  try {
+    event = stripe(process.env.STRIPE_PASSWORD).webhooks.constructEvent(
+      request.body,
+      sig,
+      process.env.STRIPE_SIGNING_SECRET
+    );
   
-      try {
-        
-        event = stripe(process.env.STRIPE_PASSWORD).webhooks.constructEvent(
-          request.body,
-          sig,
-          process.env.STRIPE_SIGNING_SECRET
-        );
+  } catch (err) {
+    console.error(`Webhook Error: ${err.message}`);
+    response.status(400).send(`Webhook Error: ${err.message}`);
+    return;
+  }
+
+  let session = "";
+
+  switch (event.type) {
+    case 'payment_intent.canceled':
+      session = event.data.object;
+      break;
+    case 'payment_intent.payment_failed':
+      session = event.data.object;
+      break;
+    case 'payment_intent.succeeded':
+      session = event.data.object;
       
-      } catch (err) {
-        console.error(`Webhook Error: ${err.message}`);
-        response.status(400).send(`Webhook Error: ${err.message}`);
-        return;
+    const updatedProduct = await orders.findOneAndUpdate(
+      { paymentIntentId: session.id },
+      { status: "success" },
+      { new: true }
+    );
+
+
+    const filesUrls=[]
+    await Promise.all(updatedProduct.products.map(async(val)=>{
+      const fileData= await files.findOne({_id:val.fileId})
+      filesUrls.push(fileData.file)
+    }))
+
+      const obj={
+        orderId: updatedProduct.id,
+        status: updatedProduct.status,
+        products: updatedProduct.products
       }
-  
-      let session = "";
-  
+
+      const userData= await user.findOneAndUpdate({_id:session.metadata.userId}, {
+        $push:{myOrders:obj}
+      },{new:true})
+
+      const emailTo = session.metadata.email;
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+
+      
+      async function main() {
+        
+        const info = await transporter.sendMail({
+          from: process.env.EMAIL, 
+          to: emailTo, 
+          subject: "Thanks for the payment for the product", 
+          text: "Thanks for the payment for the product", 
+          html: `
+            Hello ${session.metadata.email}, thanks for the payment of the product.<br />
+            Here's the link to the Books from Google Drive. You can download the files by visiting these links:<br />
+            ${filesUrls.map((val) => `<a href="${val}">${val}</a>`).join('<br />')}
+          `,
+        });
+        
+        console.log("Message sent: %s", info.messageId);
+      }
+      main().catch(console.error);
+      
+      break;
    
-      switch (event.type) {
-        case "checkout.session.async_payment_failed":
-          session = event.data.object;
-          console.log(session);
-          
-          break;
-        case "checkout.session.completed":
-          session = event.data.object;
-          console.log(session);
-          // Send invoice email using nodemailer
-          const emailTo = session.customer_details.email;
-  
-          const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 587,
-            secure: false,
-            auth: {
-              user: process.env.EMAIL,
-              pass: process.env.EMAIL_PASSWORD,
-            },
-          });
-  
-          // async..await is not allowed in global scope, must use a wrapper
-          async function main() {
-            // Send mail with defined transport object
-            const info = await transporter.sendMail({
-              from: process.env.EMAIL, // sender address
-              to: emailTo, // list of receivers
-              subject: "Thanks for the payment for the product", // Subject line
-              text: "Thanks for the payment for the product", // Plain text body
-              html: `
-                        Hello ${session.customer_details.email}, thanks for the payment of the product.
-                        Here's the link to the product from Google Drive: ${product}. You can download the file by going to this link.
-                      `, // HTML body
-            });
-            // console.log("Message sent: %s", info.messageId);
-          }
-          main().catch(console.error);
-          break;
-        // ... handle other event types
-        default:
-          console.log(`Unhandled event type ${event.type}`);
-      }
-  
-      // Return a 200 response to acknowledge receipt of the event
-      response.status(200).send();
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+  response.status(200).send();
     }
