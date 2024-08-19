@@ -15,12 +15,11 @@ dotenv.config();
 const app=express();
 app.use(cors({ origin: "*", methods: ["GET", "POST", "DELETE", "PUT"] }));
 app.post("/webhook", express.raw({ type: "application/json" }),async(request, response) => {
-    console.log('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
-    const sig = request.headers["stripe-signature"];
 
+    console.log('Webhook Called!!!!!!!!!');
+
+    const sig = request.headers["stripe-signature"];
     let event;
-    const productFile =
-      "https://drive.google.com/file/d/1K5LwwK-4875LMuT2978Yw8vr1MU0oPck/view?usp=drive_link";
 
     try {
       event = stripe(process.env.STRIPE_PASSWORD).webhooks.constructEvent(
@@ -40,34 +39,29 @@ app.post("/webhook", express.raw({ type: "application/json" }),async(request, re
     switch (event.type) {
       case 'payment_intent.canceled':
         session = event.data.object;
-        // Then define and call a function to handle the event payment_intent.canceled
         break;
       case 'payment_intent.payment_failed':
         session = event.data.object;
-        // Then define and call a function to handle the event payment_intent.payment_failed
         break;
       case 'payment_intent.succeeded':
         session = event.data.object;
-        // Send invoice email using nodemailer
+        
       const updatedProduct = await orders.findOneAndUpdate(
         { paymentIntentId: session.id },
         { status: "success" },
         { new: true }
       );
 
-      // console.log(product);
-      // for(let i=0;i<updatedProduct.products.length; i++){
-      //   const fileId= 
-      // }
+  
       const filesUrls=[]
-      await Promise.all(updatedProduct.products.map(async(val, i)=>{
-        console.log(val.fileId);
+      await Promise.all(updatedProduct.products.map(async(val)=>{
         const fileData= await files.findOne({_id:val.fileId})
         filesUrls.push(fileData.file)
       }))
 
         const obj={
           orderId: updatedProduct.id,
+          status: updatedProduct.status,
           products: updatedProduct.products
         }
 
@@ -86,33 +80,30 @@ app.post("/webhook", express.raw({ type: "application/json" }),async(request, re
           },
         });
 
-        // async..await is not allowed in global scope, must use a wrapper
+        
         async function main() {
-          // Send mail with defined transport object
+          
           const info = await transporter.sendMail({
-            from: process.env.EMAIL, // sender address
-            to: emailTo, // list of receivers
-            subject: "Thanks for the payment for the product", // Subject line
-            text: "Thanks for the payment for the product", // Plain text body
+            from: process.env.EMAIL, 
+            to: emailTo, 
+            subject: "Thanks for the payment for the product", 
+            text: "Thanks for the payment for the product", 
             html: `
               Hello ${session.metadata.email}, thanks for the payment of the product.<br />
               Here's the link to the Books from Google Drive. You can download the files by visiting these links:<br />
               ${filesUrls.map((val) => `<a href="${val}">${val}</a>`).join('<br />')}
-            `, // HTML body
+            `,
           });
           
           console.log("Message sent: %s", info.messageId);
         }
         main().catch(console.error);
-        // Then define and call a function to handle the event payment_intent.succeeded
+        
         break;
-      // ... handle other event types
+     
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
-
-
-    // Return a 200 response to acknowledge receipt of the event
     response.status(200).send();
   }
 );
