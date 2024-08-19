@@ -42,13 +42,13 @@ export const createPayment= async(req,res)=> {
             const current_intent = await stripeFunction.paymentIntents.retrieve(
                 payment_intent_id
               );
-            //   console.log('current Intent:e ', current_intent);
+            
               if(current_intent){
                 const updated_intent = await stripeFunction.paymentIntents.update(
                     payment_intent_id,
                     {amount:totalAmount}
                   );
-                //   console.log('updatedd intentt: ',updated_intent);
+                
                   const [existingOrder, updatedOrder] = await Promise.all([
                     orders.findOne({ paymentIntentId: payment_intent_id }),
                     orders.findOneAndUpdate(
@@ -60,11 +60,11 @@ export const createPayment= async(req,res)=> {
                         { new: true } 
                     )
                 ]);
-                //   console.log('existingg order: ', existingOrder);
+                
                   if(!existingOrder){
                     return res.status(400).json({error:"Invalid Intent Id!"})
                   }
-                  // console.log(updated_intent);
+                  
                   res.json(updated_intent)
               }             
             

@@ -34,41 +34,50 @@ const page = () => {
   return (
     <div>
       <Navbar />
-      <div className=" m-5">
-        <div className=" flex justify-between">
-          <div>Image</div>
-          <div>Price</div>
-          <div>Quantity</div>
-          <div>Payment Status</div>
-          <div>Order Status</div>
-        </div>
-        <div className=" flex flex-col gap-6">
+      <div className="m-5">
+  <div className="grid grid-cols-5 gap-4 mb-8 text-2xl font-semibold">
+    <div>Image</div>
+    <div>Price</div>
+    <div>Quantity</div>
+    <div>Payment Status</div>
+    <div>Order Placed</div>
+  </div>
+  <div className="flex flex-col gap-6">
+    {
+      //@ts-ignore
+      orders.map((item, i) => (
+        <div className="flex flex-col gap-10" key={i}>
+          
           {
-            //@ts-ignore
-            orders.map((item, i) => (
-              <div className="flex flex-col gap-6">
-                {
-                  // @ts-ignore
-                  item.products.map((val) => (
-                    <div className=" flex justify-between">
-                      <img
-                        src={val.image}
-                        alt={val.bookname}
-                        className="h-16 w-16 rounded object-cover"
-                      />
-                      <div>{val.price}</div>
-                      <div>{val.quantity}</div>
-                      <div>Success</div>
-                      <div>Delivered</div>
-                    </div>
-                  ))
-                }
-                {/* <div className=" absolute top-36  h-1 w-[100vw] bg-black"></div> */}
+            // @ts-ignore
+            item.products.map((val, index) => (
+              <div key={index} className=" flex flex-col gap-4">
+                {/* @ts-ignore */}
+                   <div className=" font-medium">OrderId: {item.orderId}</div>
+              <div  className="grid grid-cols-5 gap-4 items-center">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={val.image}
+                    alt={val.bookname}
+                    className="h-16 w-16 rounded object-cover"
+                  />
+                  <div className="font-medium text-sm">{val.bookname}</div>
+                </div>
+                <div>{val.price}</div>
+                <div>{val.quantity}</div>
+                {/* @ts-ignore */}
+                <div>{item.status}</div>
+                <div>{val.createdAt.slice(0, 10)}</div>
+              </div>
               </div>
             ))
           }
         </div>
-      </div>
+      ))
+    }
+  </div>
+</div>
+
     </div>
   );
 };

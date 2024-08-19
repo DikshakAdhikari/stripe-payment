@@ -30,21 +30,17 @@ export const getAllBooks = async (req, res) => {
   try {
     const category = req.query.category;
 
-    // If category is not provided or is empty, handle it early.
     if (!category) {
       const books = await Books.find();
       return res.json(books);
     }
 
-    // Split the category string by commas
     let arr = category.split(",");
 
-    // Create an array of genre objects for the $or query
     let newArr = arr.map((val) => ({ genre: val.trim() }));
 
-    console.log(newArr); // Log the newArr to check its content
+    console.log(newArr); 
 
-    // Find books based on the genres
     const books = await Books.find({ $or: newArr });
 
     res.json(books);

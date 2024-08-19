@@ -27,6 +27,9 @@ const orderModel= new mongoose.Schema({
     orderId:{
         type:String
     },
+    status:{
+        type:String
+    },
     products:{
         type: [productModel]
     }
