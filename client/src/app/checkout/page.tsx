@@ -42,7 +42,6 @@ export default function App() {
         throw new Error("Network problem!")
       }
       const data = await res.json()
-      console.log(data);
       
       setLoading(false)
       if( data?.message?.statusCode === 400){
@@ -69,7 +68,6 @@ export default function App() {
     
 
   const options = {
-    // passing the client secret obtained from the server
     clientSecret:clientSecret,
     appearance:{
         theme:'stripe',
@@ -88,13 +86,13 @@ export default function App() {
     </Elements>
     </>
     }
-    <div>
+    <div className=' flex justify-center items-center h-[70vh]'>
       {
         loading && <div>Loading......</div>
       }
       {
         checkoutSuccess && <div>
-          <button className=' bg-green-600 text-white p-3 rounded-md'>Check orders</button>
+          <button onClick={()=>router.push("/my-orders")} className=' bg-green-600 text-white p-3 rounded-md'>Check orders</button>
         </div>
       }
     </div>

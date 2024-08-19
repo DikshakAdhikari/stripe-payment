@@ -19,7 +19,7 @@ const page = () => {
         throw new Error("Network problem!");
       }
       const data = await res.json();
-      console.log(data.myOrders);
+      // console.log(data.myOrders);
       setOrders(data.myOrders);
     } catch (err) {
       console.log(err);
