@@ -36,7 +36,7 @@ const page = () => {
     <div>
       <Navbar />
       { orders.length>0 ?
-      <div className="m-5">
+      <div className="m-5 pl-10 ">
   <div className="grid grid-cols-5 gap-4 mb-8 text-2xl font-semibold">
     <div>Book Info</div>
     <div>Price</div>
@@ -56,7 +56,7 @@ const page = () => {
               <div key={index} className=" flex flex-col gap-4">
                 {/* @ts-ignore */}
                    <div className=" font-medium">OrderId: {item.orderId}</div>
-              <div  className="grid grid-cols-5 gap-4 items-center">
+              <div  className="grid grid-cols-5 gap-4 items-center text-center">
                 <div className="flex items-center gap-4">
                   <img
                     src={val.image}

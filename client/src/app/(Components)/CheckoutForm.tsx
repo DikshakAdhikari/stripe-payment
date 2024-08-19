@@ -5,9 +5,11 @@ import { AppDispatch } from './GlobalRedux/store';
 import { useDispatch } from 'react-redux';
 import { resetBooks } from './GlobalRedux/Features/BookSlice';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 //@ts-ignore
 const CheckoutForm = ({clientSecret, setClientSecret,setCheckoutSuccess}) => {
+  const router= useRouter()
   const dispatch: AppDispatch = useDispatch();
     const stripe = useStripe();
     const elements = useElements();
@@ -36,6 +38,10 @@ const CheckoutForm = ({clientSecret, setClientSecret,setCheckoutSuccess}) => {
         setCheckoutSuccess(true)
         setClientSecret(null)
         localStorage.removeItem("paymentIntentId")
+      }else{
+        alert("Card Declined! Purchase again!")
+        router.push('/')
+        
       }
       
      
