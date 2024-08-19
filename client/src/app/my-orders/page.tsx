@@ -36,7 +36,7 @@ const page = () => {
       <Navbar />
       <div className="m-5">
   <div className="grid grid-cols-5 gap-4 mb-8 text-2xl font-semibold">
-    <div>Image</div>
+    <div>Book Info</div>
     <div>Price</div>
     <div>Quantity</div>
     <div>Payment Status</div>
