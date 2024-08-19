@@ -1,10 +1,9 @@
-import nodemailer from 'nodemailer'
 import dotenv from 'dotenv'
 import Stripe from 'stripe';
 import orders from '../models/orders.js';
-import user from '../models/user.js';
-import files from '../models/files.js';
 import stripe from 'stripe'
+import sendEmail from '../mail/sendEmail.js';
+import updateDBs from '../actions/updateDBs.js';
 dotenv.config()
 
 const stripeFunction = new Stripe(process.env.STRIPE_PASSWORD, {
@@ -17,7 +16,7 @@ const stripeFunction = new Stripe(process.env.STRIPE_PASSWORD, {
         total += (item.price*item.quantity)
     });
     
-    return Math.floor(total)
+    return total.toFixed(2)
 }
 
 
@@ -90,7 +89,6 @@ export const createPayment= async(req,res)=> {
 }
 
 
-
 export const handleWebhook = async(request,response)=>{
   
   console.log('Webhook Called!!!!!!!!!');
@@ -119,67 +117,19 @@ export const handleWebhook = async(request,response)=>{
       break;
     case 'payment_intent.payment_failed':
       session = event.data.object;
+      const filesUrlFail= await updateDBs(session)
       break;
     case 'payment_intent.succeeded':
-      session = event.data.object;
-      
-    const updatedProduct = await orders.findOneAndUpdate(
-      { paymentIntentId: session.id },
-      { status: "success" },
-      { new: true }
-    );
-
-
-    const filesUrls=[]
-    await Promise.all(updatedProduct.products.map(async(val)=>{
-      const fileData= await files.findOne({_id:val.fileId})
-      filesUrls.push(fileData.file)
-    }))
-
-      const obj={
-        orderId: updatedProduct.id,
-        status: updatedProduct.status,
-        products: updatedProduct.products
-      }
-
-      const userData= await user.findOneAndUpdate({_id:session.metadata.userId}, {
-        $push:{myOrders:obj}
-      },{new:true})
-
+      session = event.data.object; 
+      const filesUrls= await updateDBs(session)
+      console.log(filesUrls);
       const emailTo = session.metadata.email;
-      const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASSWORD,
-        },
-      });
-
-      
-      async function main() {
-        
-        const info = await transporter.sendMail({
-          from: process.env.EMAIL, 
-          to: emailTo, 
-          subject: "Thanks for the payment for the product", 
-          text: "Thanks for the payment for the product", 
-          html: `
-            Hello ${session.metadata.email}, thanks for the payment of the product.<br />
-            Here's the link to the Books from Google Drive. You can download the files by visiting these links:<br />
-            ${filesUrls.map((val) => `<a href="${val}">${val}</a>`).join('<br />')}
-          `,
-        });
-        
-        console.log("Message sent: %s", info.messageId);
-      }
-      main().catch(console.error);
-      
+      sendEmail(filesUrls, emailTo)
       break;
    
     default:
       console.log(`Unhandled event type ${event.type}`);
   }
+  // console.log(session);
   response.status(200).send();
     }

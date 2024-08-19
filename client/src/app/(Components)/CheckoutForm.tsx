@@ -29,7 +29,7 @@ const CheckoutForm = ({clientSecret, setClientSecret,setCheckoutSuccess}) => {
         elements,
         redirect:'if_required'
       });
-      console.log(result);
+  
       if(!result.error){
         toast.success("Checkout Successfull!")
         dispatch(resetBooks())
