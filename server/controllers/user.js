@@ -19,9 +19,8 @@ try {
     if(!loggedUser){
         return res.json({message:'invalid email or password'})
     }
-    //check if password matches
+  
     const matchPassword=await bcrypt.compare(password,loggedUser.password)
-    //create a jwt token
     
     const token=jwt.sign({userid:loggedUser._id,email:loggedUser.email},process.env.JWT_SECRET, {expiresIn:"2h"});
     res.json({token})

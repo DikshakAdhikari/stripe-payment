@@ -17,9 +17,11 @@ const Navbar = () => {
 
   useEffect(()=> {
     setToken(localStorage.getItem('token'))
-  },[])
+  },[token])
+
+
   const handleOpen = () => {
-    if(token){
+    if(localStorage.getItem("token")){
       dispatch(reset())
       setIsCartOpen(!isCartOpen);
     }else{
@@ -27,11 +29,21 @@ const Navbar = () => {
     }
   };
 
+  const handleLogout= ()=> {
+    localStorage.removeItem("token")
+    setToken(null)
+    alert("Logged out successfully!")
+    router.push('/')
+  }
+
   return (
     <div className="p-4 sticky top-0 bg-black flex justify-between items-center "style={{ zIndex: 9999 }}>
       <div onClick={()=> router.push('/')} className="text-white cursor-pointer">Books</div>
         <div className=" flex gap-10">
       <div onClick={()=> router.push('/my-orders')} className=" text-white cursor-pointer">My Orders</div>
+      {
+        token && <div onClick={handleLogout} className=" text-white cursor-pointer">Logout</div>
+      }
       <div className="relative cursor-pointer" onClick={handleOpen}>
         <Image        
           src={bg}

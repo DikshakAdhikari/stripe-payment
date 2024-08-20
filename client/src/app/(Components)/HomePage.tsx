@@ -16,7 +16,6 @@ const HomePage = () => {
   const [getDisable, setDisable]= useState([])
   const dispatch: AppDispatch = useDispatch();
  
-  console.log(data);
   
   const fetchData = useCallback( async () => {
     try {

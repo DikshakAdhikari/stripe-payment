@@ -7,7 +7,7 @@ import { verifyToken } from "./verifyToken";
 export default function ClientApplication({ children }) {
   useEffect(() => {
     try{
-       verifyToken().then(()=> console.log("Token verification successul!")).catch((err)=> console.log(err))    
+       verifyToken().then(()=>{ console.log("Token verification successul!")}).catch((err)=> console.log(err))    
     }catch(err){
         console.log(err);
         

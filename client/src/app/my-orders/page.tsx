@@ -55,8 +55,8 @@ const page = () => {
             item.products.map((val, index) => (
               <div key={index} className=" flex flex-col gap-4">
                 {/* @ts-ignore */}
-                   <div className=" font-medium">OrderId: {item.orderId}</div>
-              <div  className="grid grid-cols-5 gap-4 items-center text-center">
+                   <div className=" font-medium text-sm text-gray-700">OrderId: {item.orderId}</div>
+              <div  className="grid grid-cols-5 gap-3 items-center text-center">
                 <div className="flex items-center gap-4">
                   <img
                     src={val.image}
@@ -68,7 +68,7 @@ const page = () => {
                 <div>{val.price}</div>
                 <div>{val.quantity}</div>
                 {/* @ts-ignore */}
-                <div className={`${item.status==="succeeded"?' text-green-700 font-semibold':' text-red-700 font-semibold'}`}>{item.status}</div>
+                <div className={`${item.status==="succeeded"?' text-green-700 font-semibold':' text-red-700 font-semibold'}`}>{item.status==="succeeded"? item.status : "Failed" }</div>
                 <div>{val.createdAt.slice(0, 10)}</div>
               </div>
               </div>

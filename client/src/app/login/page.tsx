@@ -2,11 +2,14 @@
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { BASE_URL } from '../(Components)/base';
+import { useDispatch } from 'react-redux';
+import { resetBooks } from '../(Components)/GlobalRedux/Features/BookSlice';
 
 const Login = () => {
     const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const[ans,setAns]=useState();
+  const dispatch= useDispatch()
+
   const router=useRouter();
 //@ts-ignore
   const handleLogin=async(e)=>{
@@ -14,15 +17,15 @@ const Login = () => {
     try {
       const res=await fetch(`${BASE_URL}/user/login`,{
         method:"POST",
-        // credentials:"include",
         headers:{
           "Content-Type":"application/json"
         },
         body:JSON.stringify({email,password})
       })
       const data=await res.json();
-  console.log(data);
+      dispatch(resetBooks())
   localStorage.setItem("token",data.token);
+  
   router.push("/")
     } catch (error) {
       console.log(error);

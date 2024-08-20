@@ -89,10 +89,10 @@ export const createPayment= async(req,res)=> {
 }
 
 
-export const handleWebhook = async(request,response)=>{
-  
-  console.log('Webhook Called!!!!!!!!!');
 
+
+export const handleWebhook = async(request,response)=>{
+  console.log('Webhook Called!!!!!!!!!');
   const sig = request.headers["stripe-signature"];
   let event;
 
@@ -102,7 +102,6 @@ export const handleWebhook = async(request,response)=>{
       sig,
       process.env.STRIPE_SIGNING_SECRET
     );
-  
   } catch (err) {
     console.error(`Webhook Error: ${err.message}`);
     response.status(400).send(`Webhook Error: ${err.message}`);
