@@ -75,9 +75,10 @@ export default function App() {
     }
   };
 
+  
   return (
     <div>
-      
+
       <Navbar />
     {clientSecret && cartBooks &&
     <>
