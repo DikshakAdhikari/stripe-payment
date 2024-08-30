@@ -37,6 +37,7 @@ export const createPayment= async(req,res)=> {
             userId: userId
         }
         
+        
         if(payment_intent_id){
             const current_intent = await stripeFunction.paymentIntents.retrieve(
                 payment_intent_id
